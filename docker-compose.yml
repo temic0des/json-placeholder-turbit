@@ -9,15 +9,20 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    environment:
+      - MONGO_URI=${MONGO_URI}
   db:
     image: mongo
-    restart: always
+    container_name: jsonplaceholder-mongodb
     env_file:
       - .env
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
-      - ./data:/data/db
+      - jsonplaceholderdata:/data/db
+volumes:
+  jsonplaceholderdata:
+    driver: local

@@ -30,3 +30,6 @@ archive.zip
 .DS_Store
 
 .env
+
+# Data Volume
+data/
