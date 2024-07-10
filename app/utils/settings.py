@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     mongo_initdb_root_host: str
     mongo_initdb_root_dbname: str
     mongo_url: Optional[MongoDsn] = None
+    api_v1: str = '/api/v1'
+    app_name: str
 
     @field_validator('mongo_url', mode='before')
     @classmethod
