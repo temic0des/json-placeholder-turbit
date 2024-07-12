@@ -1,7 +1,4 @@
-
 from pydantic import BaseModel, ConfigDict, Field
-
-
 class PostBase(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)

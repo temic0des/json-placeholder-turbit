@@ -17,9 +17,11 @@ class UserEndpoint:
     def register_user_routes(self):
         self.user_router.post('', response_model=ResponseModel, 
                               status_code=status.HTTP_201_CREATED)(self.create_user)
+        self.user_router.get('/all', response_model=List[UserRead])(self.get_all_users)
+        self.user_router.get('', response_model=UserRead)(self.get_user)
         self.user_router.patch('/{id}', response_model=ResponseModel)(self.update_user)
         self.user_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)(self.delete_user)
-        self.user_router.get('/all', response_model=List[UserRead])(self.get_all_users)
+        
 
     async def create_user(self, user_create: UserCreate, user_service: UserService = Depends(get_user_service)) -> ResponseModel:
         try:
@@ -51,8 +53,18 @@ class UserEndpoint:
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
 
-    async def get_all_users(self, user_service: UserService = Depends(get_user_service)):
+    async def get_all_users(self, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
         try:
-            return await user_service.get_all_users()
+            user_data = await user_service.get_all_users()
+            return user_data
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        
+    async def get_user(self, id: int, user_service: UserService = Depends(get_user_service)) -> UserRead:
+        try:
+            user_data = await user_service.get_user(id=id)
+            if not user_data:
+                raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
+            return {**user_data.user.model_dump(), 'number_of_posts': user_data.post_count}
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')

@@ -27,9 +27,9 @@ async def init_db(_: FastAPI):
     # User Seed
     user_seed = SeedData(url=API_URLS.get('user_url'))
     await user_seed.user_seed()
-    await initialize_counter(models=document_models)
     post_seed = SeedData(url=API_URLS.get('post_url'))
     await post_seed.post_seed()
+    await initialize_counter(models=document_models)
     yield
 
 app = FastAPI(lifespan=init_db, title=settings.app_name)

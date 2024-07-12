@@ -1,7 +1,9 @@
 from typing import List
+
+from app.routers.posts.post_model import Post
 from app.routers.users.user_interface import IUser
 from app.routers.users.user_model import User
-from app.routers.users.user_schema import UserCreate, UserUpdate
+from app.routers.users.user_schema import UserCreate, UserDict, UserUpdate
 from app.utils.functions import get_next_id
 
 class UserService(IUser):
@@ -38,7 +40,17 @@ class UserService(IUser):
         return users
     
     @staticmethod
+    async def get_user(id: int) -> UserDict:
+        user = await User.find_one(User.id == id)
+        if not user:
+            return None
+        post_count = await Post.find(Post.user_id == id).count()
+        user_dict = UserDict(user=User(**user.model_dump()), post_count=post_count)
+        return user_dict
+    
+    @staticmethod
     async def add_users(user_list: list[dict]) -> List[User]:
+        
         users = []
         for user in user_list:
             user_in = User(**user)
@@ -48,3 +60,4 @@ class UserService(IUser):
             return users
         except Exception as e:
             return None
+       

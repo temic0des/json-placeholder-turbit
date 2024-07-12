@@ -1,7 +1,6 @@
 from typing import Annotated
 from beanie import Document, Indexed, Insert, Replace, before_event
 from pydantic import EmailStr, Field
-
 from app.routers.users.user_schema import Address, Company
 
 class User(Document):
@@ -14,7 +13,6 @@ class User(Document):
     phone: Annotated[str, Indexed(unique=True)]
     website: str
     company: Company
-
 
     @staticmethod
     async def get_user_by_id(id):

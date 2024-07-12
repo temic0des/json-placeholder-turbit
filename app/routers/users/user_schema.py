@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class Geo(BaseModel):
@@ -38,8 +38,9 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
+    id: int = Field(..., alias="_id")
     name: str
     username: str
     email: EmailStr
@@ -47,6 +48,7 @@ class UserRead(UserBase):
     address: Address
     website: str
     company: Company
+    number_of_posts: int = 0
 
 class UserUpdate(UserBase):
 
@@ -59,3 +61,8 @@ class UserUpdate(UserBase):
     address: Optional[Address] = None
     website: Optional[str] = None
     company: Optional[Company] = None
+
+class UserDict(BaseModel):
+
+    user: Any
+    post_count: int = 0
