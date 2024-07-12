@@ -12,4 +12,4 @@ class PostCreate(PostBase):
 
 class PostRead(PostBase):
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    pass

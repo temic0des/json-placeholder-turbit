@@ -2,12 +2,11 @@ from contextlib import asynccontextmanager
 from beanie import init_beanie
 from fastapi import FastAPI
 from app.routers.router import router
-from app.common.seed_data.seed_data import SeedData
-from app.utils.api_urls import API_URLS
+from app.utils.api_urls import run_seed
 from app.utils.database_connection import db
 from app.utils.document_models import document_models
-from app.utils.functions import initialize_counter
 from app.utils.settings import settings
+from app.utils.functions import initialize_counter
 
 @asynccontextmanager
 async def init_db(_: FastAPI):
@@ -24,11 +23,9 @@ async def init_db(_: FastAPI):
     database_instance = await db.get_database()
     # Beanie Initialization
     await init_beanie(database=database_instance, document_models=document_models)
-    # User Seed
-    user_seed = SeedData(url=API_URLS.get('user_url'))
-    await user_seed.user_seed()
-    post_seed = SeedData(url=API_URLS.get('post_url'))
-    await post_seed.post_seed()
+    # Seed Run
+    await run_seed()
+    # Counter Initialization
     await initialize_counter(models=document_models)
     yield
 

@@ -12,13 +12,19 @@ class PostService(IPost):
         return posts
     
     @staticmethod
+    async def get_post(id: int) -> Post:
+        post = await Post.find_one(Post.id == id)
+        if not post:
+            return None
+        return post
+    
+    @staticmethod
     async def get_specific_posts(skip: int, limit: int) -> List[Post]:
         return await Post.find(skip=skip, limit=limit).to_list()
 
     @staticmethod
-    async def add_posts(post_list: List[Post]) -> List[Post]:
+    async def add_posts(post_list: List[dict]) -> List[Post]:
         posts = []
-        users = await User.find_all().to_list()
         for post in post_list:
             post_in = Post(**post)
             posts.append(post_in)

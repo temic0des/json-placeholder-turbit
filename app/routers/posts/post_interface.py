@@ -19,5 +19,10 @@ class IPost(ABC):
 
     @staticmethod
     @abstractmethod
+    async def get_post(id: int) -> Post:
+        pass
+
+    @staticmethod
+    @abstractmethod
     async def get_specific_posts(skip: int, limit: int) -> List[Post]:
         pass

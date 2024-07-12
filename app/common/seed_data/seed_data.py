@@ -1,8 +1,10 @@
+from app.routers.comments.comment_service import CommentService
 from app.routers.posts.post_model import Post
 from app.routers.posts.post_service import PostService
 from app.routers.users.user_service import UserService
 from app.utils.api_request import APIRequest
 from app.routers.users.user_model import User
+from app.routers.comments.comment_model import Comment
 
 class SeedData:
 
@@ -35,5 +37,18 @@ class SeedData:
                 return
             posts = await PostService.add_posts(post_list=post_list)
             return posts
+        except Exception as e:
+            return e
+        
+    async def comment_seed(self):
+        comment_data = self.api_request
+        comment_list = comment_data.get_data()
+        try:
+            comment_count = await Comment.find_all().count()
+            if comment_count > 0:
+                return
+            comments = await CommentService.add_comments(comment_list=comment_list)
+            print("Final Comments", comments)
+            return comments
         except Exception as e:
             return e
