@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.routers.posts.post_schema import PostRead
+from app.routers.posts.post_schema import PostCommentRead, PostRead
 from app.routers.posts.post_service import PostService
 from app.security.dependencies import get_post_service
 from pymongo.errors import PyMongoError
@@ -13,8 +13,9 @@ class PostEndpoint:
 
     def register_post_routes(self):
         self.post_router.get('/all', response_model=List[PostRead])(self.get_all_posts)
-        self.post_router.get('', response_model=PostRead)(self.get_post)
+        self.post_router.get('/{id}', response_model=PostRead)(self.get_post)
         self.post_router.get('', response_model=List[PostRead])(self.get_limited_posts)
+        self.post_router.get('/{id}/comments', response_model=PostCommentRead)(self.get_comments_by_post)
 
     async def get_all_posts(self, post_service: PostService = Depends(get_post_service)) -> List[PostRead]:
         try:
@@ -22,6 +23,8 @@ class PostEndpoint:
             return all_posts
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
     async def get_post(self, id: int, post_service: PostService = Depends(get_post_service)) -> PostRead:
         try:
@@ -31,6 +34,8 @@ class PostEndpoint:
             return post
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
     async def get_limited_posts(self, skip: int = 0, limit: int = 10, post_service: PostService = Depends(get_post_service)) -> List[PostRead]:
         try:
@@ -38,3 +43,16 @@ class PostEndpoint:
             return limited_posts
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
+        
+    async def get_comments_by_post(self, id: int, post_service: PostService = Depends(get_post_service)) -> List[PostCommentRead]:
+        try:
+            post_comments = await post_service.get_comments_by_post(id=id)
+            if not post_comments:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+            return post_comments
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')

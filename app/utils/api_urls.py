@@ -4,8 +4,6 @@ from pydantic import BaseModel, UrlConstraints
 from pydantic_core import Url
 
 from app.common.seed_data.seed_data import SeedData
-from app.utils.functions import initialize_counter
-from app.utils.document_models import document_models
 
 
 class APIUrlSchema(BaseModel):
@@ -35,11 +33,13 @@ async def run_seed():
                 user_seed = SeedData(url=str(api_url_schema.url))
                 await user_seed.user_seed()
             case 'comment_url':
-                print(str(api_url_schema.url))
                 comment_seed = SeedData(url=str(api_url_schema.url))
                 await comment_seed.comment_seed()
             case 'post_url':
                 post_seed = SeedData(url=str(api_url_schema.url))
                 await post_seed.post_seed()
+            case 'album_url':
+                album_seed = SeedData(url=str(api_url_schema.url))
+                await album_seed.album_seed()
             
     

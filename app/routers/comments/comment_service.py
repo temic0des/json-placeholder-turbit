@@ -8,10 +8,8 @@ class CommentService(IComment):
     @staticmethod
     async def add_comments(comment_list: List[dict]) -> List[Comment]:
         comments = [Comment(**comment) for comment in comment_list]
-        print("In ADD COMMENTS", comments[0])
         try:
-            x = await Comment.insert_many(comments)
-            print(x.acknowledged)
+            await Comment.insert_many(comments)
             return comments
         except:
             return None

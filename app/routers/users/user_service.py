@@ -1,9 +1,10 @@
 from typing import List
 
+from app.routers.albums.album_model import Album
 from app.routers.posts.post_model import Post
 from app.routers.users.user_interface import IUser
 from app.routers.users.user_model import User
-from app.routers.users.user_schema import UserCreate, UserDict, UserUpdate
+from app.routers.users.user_schema import UserCreate, UserPostRead, UserRead, UserUpdate
 from app.utils.functions import get_next_id
 
 class UserService(IUser):
@@ -35,29 +36,46 @@ class UserService(IUser):
         return user
     
     @staticmethod
-    async def get_all_users() -> List[User]:
+    async def get_all_users() -> List[UserRead]:
         users = await User.find_all().to_list()
-        return users
+        user_data = []
+        for user in users:
+            post_count = await Post.find(Post.user_id == user.id).count()
+            user_read = UserRead(**user.model_dump(), number_of_posts=post_count)
+            user_data.append(user_read)
+        return user_data
     
     @staticmethod
-    async def get_user(id: int) -> UserDict:
+    async def get_user(id: int) -> UserRead:
         user = await User.find_one(User.id == id)
         if not user:
             return None
         post_count = await Post.find(Post.user_id == id).count()
-        user_dict = UserDict(user=User(**user.model_dump()), post_count=post_count)
+        user_dict = UserRead(**user.model_dump(), number_of_posts=post_count)
         return user_dict
     
     @staticmethod
-    async def add_users(user_list: list[dict]) -> List[User]:
+    async def add_users(user_list: list[dict]) -> List[User]:   
+        users = [User(**user) for user in user_list]
+        await User.insert_many(users)
+        return users
+ 
         
-        users = []
-        for user in user_list:
-            user_in = User(**user)
-            users.append(user_in)
-        try:
-            await User.insert_many(users)
-            return users
-        except Exception as e:
+    @staticmethod
+    async def get_user_posts(id: int) -> UserPostRead:
+        user = await User.find_one(User.id == id)
+        if not user:
             return None
-       
+        user_posts = await Post.find(Post.user_id == id).to_list()
+        user_data_read = UserPostRead(**user.model_dump(), posts=user_posts)
+        return user_data_read
+
+    @staticmethod
+    async def get_specific_users(skip: int, limit: int) -> List[UserRead]:
+        users = await User.find(skip=skip, limit=limit).to_list()
+        user_data = []
+        for user in users:
+            post_count = await Post.find(Post.user_id == user.id).count()
+            user_read = UserRead(**user.model_dump(), number_of_posts=post_count)
+            user_data.append(user_read)
+        return user_data

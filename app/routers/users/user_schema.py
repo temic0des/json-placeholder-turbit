@@ -1,5 +1,8 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+from app.routers.albums.album_model import Album
+from app.routers.posts.post_model import Post
 
 class Geo(BaseModel):
 
@@ -24,33 +27,28 @@ class Address(BaseModel):
 
 class UserBase(BaseModel):
 
-    pass
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    name: str
+    username: str
+    email: EmailStr
+    address: Address
+    phone: str
+    website: str
+    company: Company
 
 class UserCreate(UserBase):
 
-    name: str
-    username: str
-    email: EmailStr
-    address: Address
-    phone: str
-    website: str
-    company: Company
+    pass
 
 class UserRead(UserBase):
 
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
     id: int = Field(..., alias="_id")
-    name: str
-    username: str
-    email: EmailStr
-    phone: str
-    address: Address
-    website: str
-    company: Company
     number_of_posts: int = 0
 
-class UserUpdate(UserBase):
+class UserUpdate(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -62,7 +60,9 @@ class UserUpdate(UserBase):
     website: Optional[str] = None
     company: Optional[Company] = None
 
-class UserDict(BaseModel):
+class UserPostRead(UserBase):
 
-    user: Any
-    post_count: int = 0
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int = Field(..., alias="_id")
+    posts: List[Post] = []

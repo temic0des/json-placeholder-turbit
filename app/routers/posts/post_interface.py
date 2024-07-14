@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from app.routers.posts.post_model import Post
-from app.routers.posts.post_schema import PostCreate
+from app.routers.posts.post_schema import PostCommentRead, PostRead
 
 
 class IPost(ABC):
@@ -14,7 +14,7 @@ class IPost(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_all_posts() -> List[Post]:
+    async def get_all_posts() -> List[PostRead]:
         pass
 
     @staticmethod
@@ -25,4 +25,9 @@ class IPost(ABC):
     @staticmethod
     @abstractmethod
     async def get_specific_posts(skip: int, limit: int) -> List[Post]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    async def get_comments_by_post(id: int) -> PostCommentRead:
         pass

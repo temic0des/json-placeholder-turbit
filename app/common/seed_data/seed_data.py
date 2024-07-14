@@ -1,3 +1,5 @@
+from app.routers.albums.album_model import Album
+from app.routers.albums.album_service import AlbumService
 from app.routers.comments.comment_service import CommentService
 from app.routers.posts.post_model import Post
 from app.routers.posts.post_service import PostService
@@ -48,7 +50,18 @@ class SeedData:
             if comment_count > 0:
                 return
             comments = await CommentService.add_comments(comment_list=comment_list)
-            print("Final Comments", comments)
             return comments
+        except Exception as e:
+            return e
+        
+    async def album_seed(self):
+        album_data = self.api_request
+        album_list = album_data.get_data()
+        try:
+            album_count = await Album.find_all().count()
+            if album_count > 0:
+                return
+            albums = await AlbumService.add_albums(album_list=album_list)
+            return albums
         except Exception as e:
             return e
