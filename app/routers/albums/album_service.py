@@ -1,7 +1,6 @@
 from typing import List
 from app.routers.albums.album_interface import IAlbum
 from app.routers.albums.album_model import Album
-from app.routers.albums.album_schema import AlbumCreate
 
 
 class AlbumService(IAlbum):
@@ -9,8 +8,11 @@ class AlbumService(IAlbum):
     @staticmethod
     async def add_albums(album_list: List[dict]) -> List[Album]:
         albums = [Album(**album) for album in album_list]
-        await Album.insert_many(albums)
-        return albums
+        try:
+            await Album.insert_many(albums)
+            return albums
+        except Exception as e:
+            return e
        
         
     @staticmethod

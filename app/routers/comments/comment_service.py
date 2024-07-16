@@ -11,8 +11,9 @@ class CommentService(IComment):
         try:
             await Comment.insert_many(comments)
             return comments
-        except:
-            return None
+        except Exception as e:
+            return e
+        
     
     @staticmethod
     async def get_all_comments() -> List[Comment]:
@@ -23,3 +24,8 @@ class CommentService(IComment):
     async def get_specific_comments(skip: int, limit: int) -> List[Comment]:
         comments = await Comment.find(skip=skip, limit=limit).to_list()
         return comments
+    
+    @staticmethod
+    async def get_comment(id: int) -> Comment:
+        comment = await Comment.find_one(Comment.id == id)
+        return comment

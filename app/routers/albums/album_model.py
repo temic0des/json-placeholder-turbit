@@ -14,7 +14,7 @@ class Album(Document):
     
     @before_event(Insert, Replace)
     def lower_title(self):
-        self.title = self.title.capitalize()
+        self.title = self.title.lower()
     
     class Settings:
 

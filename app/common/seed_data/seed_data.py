@@ -1,8 +1,12 @@
 from app.routers.albums.album_model import Album
 from app.routers.albums.album_service import AlbumService
 from app.routers.comments.comment_service import CommentService
+from app.routers.photos.photo_model import Photo
+from app.routers.photos.photo_service import PhotoService
 from app.routers.posts.post_model import Post
 from app.routers.posts.post_service import PostService
+from app.routers.todos.todo_model import Todo
+from app.routers.todos.todo_service import TodoService
 from app.routers.users.user_service import UserService
 from app.utils.api_request import APIRequest
 from app.routers.users.user_model import User
@@ -63,5 +67,29 @@ class SeedData:
                 return
             albums = await AlbumService.add_albums(album_list=album_list)
             return albums
+        except Exception as e:
+            return e
+        
+    async def photo_seed(self):
+        photo_data = self.api_request
+        photo_list = photo_data.get_data()
+        try:
+            photo_count = await Photo.find_all().count()
+            if photo_count > 0:
+                return
+            photos = await PhotoService.add_photos(photo_list=photo_list)
+            return photos
+        except Exception as e:
+            return e
+        
+    async def todo_seed(self):
+        todo_data = self.api_request
+        todo_list = todo_data.get_data()
+        try:
+            todo_count = await Todo.find_all().count()
+            if todo_count > 0:
+                return
+            todos = await TodoService.add_todos(todo_list=todo_list)
+            return todos
         except Exception as e:
             return e

@@ -10,7 +10,7 @@ class Photo(Document):
     album_id: int = Field(..., alias="albumId")
     title: Annotated[str, Indexed(unique=True)]
     url: Annotated[Url, UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
-    thumbnail_url: Annotated[Url, UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
+    thumbnail_url: Annotated[Url, Field(alias='thumbnailUrl'), UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
 
     def __str__(self) -> str:
         return self.title

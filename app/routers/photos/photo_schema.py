@@ -9,7 +9,7 @@ class PhotoBase(BaseModel):
 
     album_id: int = Field(..., alias="albumId")
     url: Annotated[Url, UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
-    thumbnail_url: Annotated[Url, UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
+    thumbnail_url: Annotated[Url, Field(alias='thumbnailUrl'), UrlConstraints(max_length=2083, allowed_schemes=["http", "https"])]
 
 class PhotoRead(PhotoBase):
 

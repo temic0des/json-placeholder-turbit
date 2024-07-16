@@ -41,5 +41,9 @@ async def run_seed():
             case 'album_url':
                 album_seed = SeedData(url=str(api_url_schema.url))
                 await album_seed.album_seed()
-            
-    
+            case 'photo_url':
+                photo_seed = SeedData(url=str(api_url_schema.url))
+                await photo_seed.photo_seed()
+            case 'todo_url':
+                todo_seed = SeedData(url=str(api_url_schema.url))
+                await todo_seed.todo_seed()

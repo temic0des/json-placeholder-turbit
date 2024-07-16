@@ -24,6 +24,8 @@ class CommentEndpoint:
             return all_comments
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
     async def get_comment(self, id: int, comment_service: CommentService = Depends(get_comment_service)) -> CommentRead:
         try:
@@ -31,6 +33,8 @@ class CommentEndpoint:
             return comment
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
     async def get_limited_comments(self, skip: int = 0, limit: int = 10, comment_service: CommentService = Depends(get_comment_service)):
         try:
@@ -38,3 +42,5 @@ class CommentEndpoint:
             return limited_comments
         except PyMongoError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')

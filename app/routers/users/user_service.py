@@ -57,8 +57,11 @@ class UserService(IUser):
     @staticmethod
     async def add_users(user_list: list[dict]) -> List[User]:   
         users = [User(**user) for user in user_list]
-        await User.insert_many(users)
-        return users
+        try:
+            await User.insert_many(users)
+            return users
+        except Exception as e:
+            return e
  
         
     @staticmethod

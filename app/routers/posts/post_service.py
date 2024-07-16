@@ -39,8 +39,11 @@ class PostService(IPost):
     @staticmethod
     async def add_posts(post_list: List[dict]) -> List[Post]:
         posts = [Post(**post) for post in post_list]
-        await Post.insert_many(posts)
-        return posts
+        try:
+            await Post.insert_many(posts)
+            return posts
+        except Exception as e:
+            return e
         
     
     @staticmethod

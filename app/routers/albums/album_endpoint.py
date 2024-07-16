@@ -16,8 +16,8 @@ class AlbumEndpoint:
 
     def register_album_routes(self):
         self.album_router.get('/all', response_model=List[AlbumRead])(self.get_all_albums)
-        self.album_router.get('/{id}', response_model=AlbumRead)
-        self.album_router.get('', response_model=List[AlbumRead])
+        self.album_router.get('/{id}', response_model=AlbumRead)(self.get_album)
+        self.album_router.get('', response_model=List[AlbumRead])(self.get_specific_albums)
 
 
     async def get_all_albums(self, album_service: AlbumService = Depends(get_album_service)) -> List[AlbumRead]:

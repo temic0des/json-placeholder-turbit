@@ -1,0 +1,48 @@
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, status
+from pymongo.errors import PyMongoError
+
+from app.routers.photos.photo_schema import PhotoRead
+from app.routers.photos.photo_service import PhotoService
+from app.security.dependencies import get_photo_service
+
+
+class PhotoEndpoint:
+
+    def __init__(self) -> None:
+        self.photo_router = APIRouter(tags=['Photos'], prefix='/photos')
+        self.register_photo_routes()
+
+    def register_photo_routes(self):
+        self.photo_router.get('/all', response_model=List[PhotoRead])(self.get_all_photos)
+        self.photo_router.get('/{id}', response_model=PhotoRead)(self.get_photo)
+        self.photo_router.get('', response_model=List[PhotoRead])(self.get_limited_photos)
+
+    async def get_all_photos(self, photo_service: PhotoService = Depends(get_photo_service)):
+        try:
+            all_photos = await photo_service.get_all_photos()
+            return all_photos
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
+        
+    async def get_photo(self, id: int, photo_service: PhotoService = Depends(get_photo_service)):
+        try:
+            photo = await photo_service.get_photo(id=id)
+            if not photo:
+                raise HTTPException(detail="Photo not found", status_code=status.HTTP_404_NOT_FOUND)
+            return photo
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
+        
+    async def get_limited_photos(self, skip: int = 0, limit: int = 10, photo_service: PhotoService = Depends(get_photo_service)):
+        try:
+            limited_photos = await photo_service.get_specific_photos(skip=skip, limit=limit)
+            return limited_photos
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
