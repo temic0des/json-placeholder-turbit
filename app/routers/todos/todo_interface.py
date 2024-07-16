@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List
-
 from app.routers.todos.todo_model import Todo
 
 

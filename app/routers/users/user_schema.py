@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.routers.albums.album_model import Album
@@ -66,3 +66,10 @@ class UserPostRead(UserBase):
 
     id: int = Field(..., alias="_id")
     posts: List[Post] = []
+
+class UserAlbumRead(UserBase):
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int = Field(..., alias="_id")
+    albums: List[Album] = []

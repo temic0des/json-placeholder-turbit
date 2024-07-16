@@ -4,7 +4,7 @@ from app.routers.albums.album_model import Album
 from app.routers.posts.post_model import Post
 from app.routers.users.user_interface import IUser
 from app.routers.users.user_model import User
-from app.routers.users.user_schema import UserCreate, UserPostRead, UserRead, UserUpdate
+from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
 from app.utils.functions import get_next_id
 
 class UserService(IUser):
@@ -70,8 +70,17 @@ class UserService(IUser):
         if not user:
             return None
         user_posts = await Post.find(Post.user_id == id).to_list()
-        user_data_read = UserPostRead(**user.model_dump(), posts=user_posts)
-        return user_data_read
+        user_post_read = UserPostRead(**user.model_dump(), posts=user_posts)
+        return user_post_read
+    
+    @staticmethod
+    async def get_user_albums(id: int) -> UserAlbumRead:
+        user = await User.find_one(User.id == id)
+        if not user:
+            return None
+        user_albums = await Album.find(Album.user_id == id).to_list()
+        user_album_read = UserAlbumRead(**user.model_dump(), albums=user_albums)
+        return user_album_read
 
     @staticmethod
     async def get_specific_users(skip: int, limit: int) -> List[UserRead]:

@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from app.common.schemas.response_model import ResponseModel
-from app.routers.users.user_schema import UserCreate, UserPostRead, UserRead, UserUpdate
+from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
 from app.routers.users.user_service import UserService
 from pymongo.errors import DuplicateKeyError, PyMongoError
 
@@ -20,6 +20,7 @@ class UserEndpoint:
         self.user_router.get('/all', response_model=List[UserRead])(self.get_all_users)
         self.user_router.get('/{id}', response_model=UserRead)(self.get_user)
         self.user_router.get('/{id}/posts', response_model=UserPostRead)(self.get_user_posts)
+        self.user_router.get('/{id}/albums', response_model=UserAlbumRead)(self.get_user_albums)
         self.user_router.patch('/{id}', response_model=ResponseModel)(self.update_user)
         self.user_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)(self.delete_user)
         self.user_router.get('', response_model=List[UserRead])(self.get_limited_users)
@@ -93,6 +94,16 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
+    async def get_user_albums(self, id: int, user_service: UserService = Depends(get_user_service)) -> UserAlbumRead:
+        try:
+            user_albums = await user_service.get_user_albums(id=id)
+            if not user_albums:
+                raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
+            return user_albums
+        except PyMongoError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
     async def get_limited_users(self, skip: int = 0, limit: int = 10, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
         try:

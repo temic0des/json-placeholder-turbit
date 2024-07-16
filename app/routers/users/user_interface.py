@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from app.routers.users.user_model import User
-from app.routers.users.user_schema import UserCreate, UserPostRead, UserRead, UserUpdate
+from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
 
 class IUser(ABC):
 
@@ -34,6 +34,11 @@ class IUser(ABC):
     @staticmethod
     @abstractmethod
     async def get_user_posts(id: int) -> UserPostRead:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    async def get_user_albums(id: int) -> UserAlbumRead:
         pass
 
     @staticmethod
