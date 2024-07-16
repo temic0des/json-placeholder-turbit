@@ -1,7 +1,10 @@
-from typing import List
+from typing import List, Optional
 
 from app.routers.albums.album_model import Album
+from app.routers.albums.album_schema import AlbumRead
+from app.routers.comments.comment_model import Comment
 from app.routers.posts.post_model import Post
+from app.routers.posts.post_schema import PostRead
 from app.routers.users.user_interface import IUser
 from app.routers.users.user_model import User
 from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
@@ -18,8 +21,8 @@ class UserService(IUser):
         return user_create
 
     @staticmethod
-    async def update_user(user_update: UserUpdate, id: int) -> User:
-        user = await User.get_user_by_id(id=id)
+    async def update_user(user_update: UserUpdate, user_id: int) -> User:
+        user = await User.get_user_by_id(id=user_id)
         if not user:
             return None
         updated_student = await user.set(user_update.model_dump(exclude_unset=True))
@@ -28,8 +31,8 @@ class UserService(IUser):
         return user
 
     @staticmethod
-    async def delete_user(id: int) -> User | None:
-        user = await User.get_user_by_id(id=id)
+    async def delete_user(user_id: int) -> Optional[User]:
+        user = await User.get_user_by_id(id=user_id)
         if not user:
             return None
         await user.delete()
@@ -46,11 +49,11 @@ class UserService(IUser):
         return user_data
     
     @staticmethod
-    async def get_user(id: int) -> UserRead:
-        user = await User.find_one(User.id == id)
+    async def get_user(user_id: int) -> UserRead:
+        user = await User.get_user_by_id(id=user_id)
         if not user:
             return None
-        post_count = await Post.find(Post.user_id == id).count()
+        post_count = await Post.find(Post.user_id == user_id).count()
         user_dict = UserRead(**user.model_dump(), number_of_posts=post_count)
         return user_dict
     
@@ -65,21 +68,26 @@ class UserService(IUser):
  
         
     @staticmethod
-    async def get_user_posts(id: int) -> UserPostRead:
-        user = await User.find_one(User.id == id)
+    async def get_user_posts(user_id: int) -> UserPostRead:
+        user = await User.find_one(User.id == user_id)
         if not user:
             return None
-        user_posts = await Post.find(Post.user_id == id).to_list()
-        user_post_read = UserPostRead(**user.model_dump(), posts=user_posts)
+        user_posts = await Post.find(Post.user_id == user_id).to_list()
+        posts_read = []
+        for user_post in user_posts:
+            comment_count = await Comment.find(Comment.post_id == user_post.id).count()
+            posts_read.append(PostRead(**user_post.model_dump(), number_of_comments=comment_count))
+        user_post_read = UserPostRead(**user.model_dump(), posts=posts_read)
         return user_post_read
     
     @staticmethod
-    async def get_user_albums(id: int) -> UserAlbumRead:
-        user = await User.find_one(User.id == id)
+    async def get_user_albums(user_id: int) -> UserAlbumRead:
+        user = await User.find_one(User.id == user_id)
         if not user:
             return None
-        user_albums = await Album.find(Album.user_id == id).to_list()
-        user_album_read = UserAlbumRead(**user.model_dump(), albums=user_albums)
+        user_albums = await Album.find(Album.user_id == user_id).to_list()
+        albums_read = [AlbumRead(**user_album.model_dump()) for user_album in user_albums]
+        user_album_read = UserAlbumRead(**user.model_dump(), albums=albums_read)
         return user_album_read
 
     @staticmethod

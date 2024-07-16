@@ -27,6 +27,8 @@ class PhotoService(IPhoto):
         return limited_photos
     
     @staticmethod
-    async def get_photo(id: int) -> Photo:
-        photo = await Photo.find_one(Photo.id == id)
+    async def get_photo_by_id(photo_id: int) -> Photo:
+        photo = await Photo.find_one(Photo.id == photo_id)
+        if not photo:
+            return None
         return photo

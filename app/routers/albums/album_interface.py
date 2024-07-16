@@ -24,5 +24,5 @@ class IAlbum(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_album(id: int) -> Album:
+    async def get_album_by_id(album_id: int) -> Album:
         pass

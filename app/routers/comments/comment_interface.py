@@ -17,7 +17,7 @@ class IComment(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_comment(id: int) -> Comment:
+    async def get_comment_by_id(comment_id: int) -> Comment:
         pass
 
     @staticmethod

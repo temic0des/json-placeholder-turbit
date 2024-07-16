@@ -19,7 +19,7 @@ class IPost(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_post(id: int) -> Post:
+    async def get_post_by_id(post_id: int) -> Post:
         pass
 
     @staticmethod
@@ -29,5 +29,5 @@ class IPost(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_comments_by_post(id: int) -> PostCommentRead:
+    async def get_comments_by_post(post_id: int) -> PostCommentRead:
         pass

@@ -14,11 +14,11 @@ class PhotoEndpoint:
         self.register_photo_routes()
 
     def register_photo_routes(self):
-        self.photo_router.get('/all', response_model=List[PhotoRead])(self.get_all_photos)
-        self.photo_router.get('/{id}', response_model=PhotoRead)(self.get_photo)
-        self.photo_router.get('', response_model=List[PhotoRead])(self.get_limited_photos)
+        self.photo_router.get('/all', response_model=List[PhotoRead])(self.fetch_all_photos)
+        self.photo_router.get('/{photo_id}', response_model=PhotoRead)(self.fetch_photo_by_id)
+        self.photo_router.get('', response_model=List[PhotoRead])(self.fetch_limited_photos)
 
-    async def get_all_photos(self, photo_service: PhotoService = Depends(get_photo_service)):
+    async def fetch_all_photos(self, photo_service: PhotoService = Depends(get_photo_service)):
         try:
             all_photos = await photo_service.get_all_photos()
             return all_photos
@@ -27,9 +27,9 @@ class PhotoEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def get_photo(self, id: int, photo_service: PhotoService = Depends(get_photo_service)):
+    async def fetch_photo_by_id(self, photo_id: int, photo_service: PhotoService = Depends(get_photo_service)):
         try:
-            photo = await photo_service.get_photo(id=id)
+            photo = await photo_service.get_photo_by_id(photo_id=photo_id)
             if not photo:
                 raise HTTPException(detail="Photo not found", status_code=status.HTTP_404_NOT_FOUND)
             return photo
@@ -38,7 +38,7 @@ class PhotoEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def get_limited_photos(self, skip: int = 0, limit: int = 10, photo_service: PhotoService = Depends(get_photo_service)):
+    async def fetch_limited_photos(self, skip: int = 0, limit: int = 10, photo_service: PhotoService = Depends(get_photo_service)):
         try:
             limited_photos = await photo_service.get_specific_photos(skip=skip, limit=limit)
             return limited_photos

@@ -17,13 +17,13 @@ class UserEndpoint:
     def register_user_routes(self):
         self.user_router.post('', response_model=ResponseModel, 
                               status_code=status.HTTP_201_CREATED)(self.create_user)
-        self.user_router.get('/all', response_model=List[UserRead])(self.get_all_users)
-        self.user_router.get('/{id}', response_model=UserRead)(self.get_user)
-        self.user_router.get('/{id}/posts', response_model=UserPostRead)(self.get_user_posts)
-        self.user_router.get('/{id}/albums', response_model=UserAlbumRead)(self.get_user_albums)
-        self.user_router.patch('/{id}', response_model=ResponseModel)(self.update_user)
-        self.user_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)(self.delete_user)
-        self.user_router.get('', response_model=List[UserRead])(self.get_limited_users)
+        self.user_router.get('/all', response_model=List[UserRead])(self.fetch_all_users)
+        self.user_router.get('/{user_id}', response_model=UserRead)(self.fetch_user)
+        self.user_router.get('/{user_id}/posts', response_model=UserPostRead)(self.fetch_user_posts)
+        self.user_router.get('/{user_id}/albums', response_model=UserAlbumRead)(self.fetch_user_albums)
+        self.user_router.patch('/{user_id}', response_model=ResponseModel)(self.update_user)
+        self.user_router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT)(self.delete_user)
+        self.user_router.get('', response_model=List[UserRead])(self.fetch_limited_users)
         
 
     async def create_user(self, user_create: UserCreate, user_service: UserService = Depends(get_user_service)) -> ResponseModel:
@@ -38,9 +38,9 @@ class UserEndpoint:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
     
     
-    async def update_user(self, id: int, user_update: UserUpdate = Body(...), user_service: UserService = Depends(get_user_service)) -> ResponseModel:
+    async def update_user(self, user_id: int, user_update: UserUpdate = Body(...), user_service: UserService = Depends(get_user_service)) -> ResponseModel:
         try:
-            updated_user = await user_service.update_user(user_update=user_update, id=id)
+            updated_user = await user_service.update_user(user_update=user_update, user_id=user_id)
             if not updated_user:
                 raise HTTPException(detail='User not found', status_code=status.HTTP_404_NOT_FOUND)
             return ResponseModel(message="User Updated Successfully", success=True, data=updated_user)
@@ -51,9 +51,9 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def delete_user(self, id: int, user_service: UserService = Depends(get_user_service)):
+    async def delete_user(self, user_id: int, user_service: UserService = Depends(get_user_service)):
         try:
-            deleted_user = await user_service.delete_user(id=id)
+            deleted_user = await user_service.delete_user(user_id=user_id)
             if not deleted_user:
                 raise HTTPException(detail='User not found', status_code=status.HTTP_404_NOT_FOUND)
             return ResponseModel(message=f"{deleted_user.email} deleted", success=True)
@@ -62,7 +62,7 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
-    async def get_all_users(self, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
+    async def fetch_all_users(self, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
         try:
             user_data = await user_service.get_all_users()
             return user_data
@@ -72,9 +72,9 @@ class UserEndpoint:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
         
-    async def get_user(self, id: int, user_service: UserService = Depends(get_user_service)) -> UserRead:
+    async def fetch_user(self, user_id: int, user_service: UserService = Depends(get_user_service)) -> UserRead:
         try:
-            user_data = await user_service.get_user(id=id)
+            user_data = await user_service.get_user(user_id=user_id)
             if not user_data:
                 raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
             return user_data
@@ -83,9 +83,9 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def get_user_posts(self, id: int, user_service: UserService = Depends(get_user_service)) -> UserPostRead:
+    async def fetch_user_posts(self, user_id: int, user_service: UserService = Depends(get_user_service)) -> UserPostRead:
         try:
-            user_posts = await user_service.get_user_posts(id=id)
+            user_posts = await user_service.get_user_posts(user_id=user_id)
             if not user_posts:
                 raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
             return user_posts
@@ -94,9 +94,9 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def get_user_albums(self, id: int, user_service: UserService = Depends(get_user_service)) -> UserAlbumRead:
+    async def fetch_user_albums(self, user_id: int, user_service: UserService = Depends(get_user_service)) -> UserAlbumRead:
         try:
-            user_albums = await user_service.get_user_albums(id=id)
+            user_albums = await user_service.get_user_albums(user_id=user_id)
             if not user_albums:
                 raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
             return user_albums
@@ -105,7 +105,7 @@ class UserEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
-    async def get_limited_users(self, skip: int = 0, limit: int = 10, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
+    async def fetch_limited_users(self, skip: int = 0, limit: int = 10, user_service: UserService = Depends(get_user_service)) -> List[UserRead]:
         try:
             user_data = await user_service.get_specific_users(skip=skip, limit=limit)
             return user_data

@@ -26,6 +26,6 @@ class CommentService(IComment):
         return comments
     
     @staticmethod
-    async def get_comment(id: int) -> Comment:
-        comment = await Comment.find_one(Comment.id == id)
+    async def get_comment_by_id(comment_id: int) -> Comment:
+        comment = await Comment.find_one(Comment.id == comment_id)
         return comment

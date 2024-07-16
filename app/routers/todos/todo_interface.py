@@ -17,7 +17,7 @@ class ITodo(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_todo_by_id(id: int) -> Todo:
+    async def get_todo_by_id(todo_id: int) -> Todo:
         pass
 
     @staticmethod

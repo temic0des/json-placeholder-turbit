@@ -23,8 +23,8 @@ class TodoService(ITodo):
         return await Todo.find(skip=skip, limit=limit).to_list()
     
     @staticmethod
-    async def get_todo_by_id(id: int) -> Todo:
-        todo = await Todo.find_one(Todo.id == id)
+    async def get_todo_by_id(todo_id: int) -> Todo:
+        todo = await Todo.find_one(Todo.id == todo_id)
         if not todo:
             return None
         return todo

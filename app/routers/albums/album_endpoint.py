@@ -15,12 +15,12 @@ class AlbumEndpoint:
         self.register_album_routes()
 
     def register_album_routes(self):
-        self.album_router.get('/all', response_model=List[AlbumRead])(self.get_all_albums)
-        self.album_router.get('/{id}', response_model=AlbumRead)(self.get_album)
-        self.album_router.get('', response_model=List[AlbumRead])(self.get_specific_albums)
+        self.album_router.get('/all', response_model=List[AlbumRead])(self.fetch_all_albums)
+        self.album_router.get('/{album_id}', response_model=AlbumRead)(self.fetch_album_by_id)
+        self.album_router.get('', response_model=List[AlbumRead])(self.fetch_limited_albums)
 
 
-    async def get_all_albums(self, album_service: AlbumService = Depends(get_album_service)) -> List[AlbumRead]:
+    async def fetch_all_albums(self, album_service: AlbumService = Depends(get_album_service)) -> List[AlbumRead]:
         try:
             all_albums = await album_service.get_all_albums()
             return all_albums
@@ -29,9 +29,9 @@ class AlbumEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
-    async def get_album(self, id: int, album_service: AlbumService = Depends(get_album_service)) -> AlbumRead:
+    async def fetch_album_by_id(self, album_id: int, album_service: AlbumService = Depends(get_album_service)) -> AlbumRead:
         try:
-            album = await album_service.get_album(id=id)
+            album = await album_service.get_album_by_id(album_id=album_id)
             if not album:
                 raise HTTPException(detail="Album Not Found", status_code=status.HTTP_404_NOT_FOUND)
             return album
@@ -40,7 +40,7 @@ class AlbumEndpoint:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
         
-    async def get_specific_albums(self, skip: int = 0, limit: int = 10, album_service: AlbumService = Depends(get_album_service)) -> List[AlbumRead]:
+    async def fetch_limited_albums(self, skip: int = 0, limit: int = 10, album_service: AlbumService = Depends(get_album_service)) -> List[AlbumRead]:
         try:
             limited_albums = await album_service.get_specific_albums(skip=skip, limit=limit)
             return limited_albums

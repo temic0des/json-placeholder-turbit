@@ -18,7 +18,7 @@ class IPhoto(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_photo(id: int) -> Photo:
+    async def get_photo_by_id(photo_id: int) -> Photo:
         pass
 
     @staticmethod

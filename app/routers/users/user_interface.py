@@ -13,12 +13,12 @@ class IUser(ABC):
 
     @staticmethod
     @abstractmethod
-    async def update_user(user_update: UserUpdate) -> User:
+    async def update_user(user_update: UserUpdate, user_id: int) -> User:
         pass
 
     @staticmethod
     @abstractmethod
-    async def delete_user(id: int) -> None:
+    async def delete_user(user_id: int) -> None:
         pass
 
     @staticmethod
@@ -33,12 +33,12 @@ class IUser(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_user_posts(id: int) -> UserPostRead:
+    async def get_user_posts(user_id: int) -> UserPostRead:
         pass
 
     @staticmethod
     @abstractmethod
-    async def get_user_albums(id: int) -> UserAlbumRead:
+    async def get_user_albums(user_id: int) -> UserAlbumRead:
         pass
 
     @staticmethod

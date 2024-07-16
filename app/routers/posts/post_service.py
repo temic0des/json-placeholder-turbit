@@ -18,11 +18,11 @@ class PostService(IPost):
         return post_data
     
     @staticmethod
-    async def get_post(id: int) -> PostRead:
-        post = await Post.find_one(Post.id == id)
+    async def get_post_by_id(post_id: int) -> PostRead:
+        post = await Post.find_one(Post.id == post_id)
         if not post:
             return None
-        comment_count = await Comment.find(Comment.post_id == id).count()
+        comment_count = await Comment.find(Comment.post_id == post_id).count()
         post_read = PostRead(**post.model_dump(), number_of_comments=comment_count)
         return post_read
     
@@ -47,10 +47,10 @@ class PostService(IPost):
         
     
     @staticmethod
-    async def get_comments_by_post(id: int) -> PostCommentRead:
-        post = await Post.find_one(Post.id == id)
+    async def get_comments_by_post(post_id: int) -> PostCommentRead:
+        post = await Post.find_one(Post.id == post_id)
         if not post:
             return None
-        comments = await Comment.find(Comment.post_id == id).to_list()
+        comments = await Comment.find(Comment.post_id == post_id).to_list()
         post_comments = PostCommentRead(**post.model_dump(), comments=comments)
         return post_comments

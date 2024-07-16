@@ -25,8 +25,8 @@ class AlbumService(IAlbum):
         return limited_albums
     
     @staticmethod
-    async def get_album(id: int) -> Album:
-        album = await Album.find_one(Album.id == id)
+    async def get_album_by_id(album_id: int) -> Album:
+        album = await Album.find_one(Album.id == album_id)
         if not album:
             return None
         return album

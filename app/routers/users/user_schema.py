@@ -1,8 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.routers.albums.album_model import Album
-from app.routers.posts.post_model import Post
+from app.routers.albums.album_schema import AlbumRead
+from app.routers.posts.post_schema import PostRead
 
 class Geo(BaseModel):
 
@@ -65,11 +65,11 @@ class UserPostRead(UserBase):
     model_config = ConfigDict(populate_by_name=True)
 
     id: int = Field(..., alias="_id")
-    posts: List[Post] = []
+    posts: List[PostRead] = []
 
 class UserAlbumRead(UserBase):
 
     model_config = ConfigDict(populate_by_name=True)
 
     id: int = Field(..., alias="_id")
-    albums: List[Album] = []
+    albums: List[AlbumRead] = []
