@@ -5,9 +5,11 @@ from app.routers.albums.album_schema import AlbumRead
 from app.routers.comments.comment_model import Comment
 from app.routers.posts.post_model import Post
 from app.routers.posts.post_schema import PostRead
+from app.routers.todos.todo_model import Todo
+from app.routers.todos.todo_schema import TodoRead
 from app.routers.users.user_interface import IUser
 from app.routers.users.user_model import User
-from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
+from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserTodoRead, UserUpdate
 from app.utils.functions import get_next_id
 
 class UserService(IUser):
@@ -204,6 +206,30 @@ class UserService(IUser):
         # UserAlbumRead user model with the list of albums
         user_album_read = UserAlbumRead(**user.model_dump(), albums=albums_read)
         return user_album_read
+    
+    @staticmethod
+    async def get_user_todos(user_id: int) -> UserAlbumRead:
+        """
+            Gets a user and the todos created by the user
+
+            Args:
+                user_id (int): The id of the user
+
+            Returns:
+                A user and a list of todos for the user
+        """
+
+        # Get the user by id
+        user = await User.get_user_by_id(id=user_id)
+        if not user:
+            return None
+        # Get the todos associated with the user
+        user_todos = await Todo.find(Todo.user_id == user_id).to_list()
+        # Attach each todo to the TodoRead schema
+        todos_read = [TodoRead(**user_todo.model_dump()) for user_todo in user_todos]
+        # UserTodoRead user model with the list of todos
+        user_todo_read = UserTodoRead(**user.model_dump(), todos=todos_read)
+        return user_todo_read
 
     @staticmethod
     async def get_specific_users(skip: int, limit: int) -> List[UserRead]:

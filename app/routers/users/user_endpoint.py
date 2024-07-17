@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from app.common.schemas.response_model import ResponseModel
-from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserUpdate
+from app.routers.users.user_schema import UserAlbumRead, UserCreate, UserPostRead, UserRead, UserTodoRead, UserUpdate
 from app.routers.users.user_service import UserService
 from pymongo.errors import DuplicateKeyError, PyMongoError
 
@@ -21,6 +21,7 @@ class UserEndpoint:
         self.user_router.get('/{user_id}', response_model=UserRead)(self.fetch_user)
         self.user_router.get('/{user_id}/posts', response_model=UserPostRead)(self.fetch_user_posts)
         self.user_router.get('/{user_id}/albums', response_model=UserAlbumRead)(self.fetch_user_albums)
+        self.user_router.get('/{user_id}/todos', response_model=UserTodoRead)(self.fetch_user_todos)
         self.user_router.patch('/{user_id}', response_model=ResponseModel)(self.update_user)
         self.user_router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT)(self.delete_user)
         self.user_router.get('', response_model=List[UserRead])(self.fetch_limited_users)
@@ -195,7 +196,7 @@ class UserEndpoint:
                 user_service (UserService): Defaults to Depends(get_user_service).
 
             Returns:
-                A user with a list of albums based on the UserPostRead schema.
+                A user with a list of albums based on the UserAlbumRead schema.
         """
         try:
             # Try to get the user and their albums
@@ -204,6 +205,31 @@ class UserEndpoint:
                 # Raise an exception of the user does not exist
                 raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
             return user_albums
+        except PyMongoError as e:
+            # Raises an exception if an error occurs while interacting with the database
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')
+        except Exception as e:
+            # Catches other exceptions
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
+        
+    async def fetch_user_todos(self, user_id: int, user_service: UserService = Depends(get_user_service)) -> UserTodoRead:
+        """
+            Fetches the user and the user todos.
+
+            Args:
+                user_id (int): The id of the user to get.
+                user_service (UserService): Defaults to Depends(get_user_service).
+
+            Returns:
+                A user with a list of todos based on the UserTodoRead schema.
+        """
+        try:
+            # Try to get the user and their todos
+            user_todos = await user_service.get_user_todos(user_id=user_id)
+            if not user_todos:
+                # Raise an exception of the user does not exist
+                raise HTTPException(detail="User not found", status_code=status.HTTP_404_NOT_FOUND)
+            return user_todos
         except PyMongoError as e:
             # Raises an exception if an error occurs while interacting with the database
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e._message}')

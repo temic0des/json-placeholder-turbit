@@ -3,6 +3,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.routers.albums.album_schema import AlbumRead
 from app.routers.posts.post_schema import PostRead
+from app.routers.todos.todo_schema import TodoRead
 
 class Geo(BaseModel):
 
@@ -73,5 +74,13 @@ class UserAlbumRead(UserBase):
 
     id: int = Field(..., alias="_id")
     albums: List[AlbumRead] = []
+
+class UserTodoRead(UserBase):
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: int = Field(..., alias="_id")
+    todos: List[TodoRead] = []
+
 
 
