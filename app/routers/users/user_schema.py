@@ -73,3 +73,5 @@ class UserAlbumRead(UserBase):
 
     id: int = Field(..., alias="_id")
     albums: List[AlbumRead] = []
+
+

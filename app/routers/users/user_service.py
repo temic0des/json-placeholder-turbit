@@ -134,7 +134,13 @@ class UserService(IUser):
     @staticmethod
     async def add_users(user_list: list[dict]) -> List[User]:
         """
-            Send a list of users to the database
+            Send a list of users to the database.
+
+            Args:
+                user_list (List[dict]): The list of users to be sent
+
+            Return
+                The list of User
         """   
         users = [User(**user) for user in user_list]
         try:
