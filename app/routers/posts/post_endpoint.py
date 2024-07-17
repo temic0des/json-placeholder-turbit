@@ -66,7 +66,7 @@ class PostEndpoint:
     async def fetch_limited_posts(self, skip: int = 0, limit: int = 10, post_service: PostService = Depends(get_post_service)) -> List[PostRead]:
         """
             Fetches a list of posts depending on the number of posts to
-            skip and the maximum number of comments to get
+            skip and the maximum number of posts to get
 
             Args:
                 skip (int): The number of posts to skip

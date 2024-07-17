@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from app.routers.albums.album_model import Album
-from app.routers.albums.album_schema import AlbumCreate
+from app.routers.albums.album_schema import AlbumPhotoRead
 
 
 class IAlbum(ABC):
@@ -25,4 +25,9 @@ class IAlbum(ABC):
     @staticmethod
     @abstractmethod
     async def get_album_by_id(album_id: int) -> Album:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    async def get_album_photos(album_id: int) -> AlbumPhotoRead:
         pass

@@ -1,5 +1,8 @@
 
+from typing import List
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.routers.photos.photo_schema import PhotoRead
 
 
 class AlbumBase(BaseModel):
@@ -16,3 +19,7 @@ class AlbumRead(AlbumBase):
 class AlbumCreate(AlbumBase):
 
     pass
+
+class AlbumPhotoRead(AlbumBase):
+
+    photos: List[PhotoRead] = []
