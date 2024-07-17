@@ -44,6 +44,9 @@ class CommentService(IComment):
             Args:
                 skip (int): The number of comments to skip
                 limit (int): Maximum number of comments to obtain
+
+            Returns:
+                A list of comments based on the Comment Model
         """
         comments = await Comment.find(skip=skip, limit=limit).to_list()
         return comments
@@ -55,6 +58,9 @@ class CommentService(IComment):
 
             Args:
                 comment_id (int): The id of the comment to get
+
+            Returns:
+                comment based on the Comment Model
         """
         comment = await Comment.find_one(Comment.id == comment_id)
         return comment
