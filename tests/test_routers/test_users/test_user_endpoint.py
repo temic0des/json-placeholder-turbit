@@ -1,0 +1,3 @@
+class TestUserEndpoint:
+
+    pass

@@ -1,13 +1,22 @@
 from app.routers.users.user_schema import UserCreate
+from app.routers.users.user_service import UserService
 from tests.test_routers.test_users.data_dump import user_data
 import pytest
 import pytest_asyncio
 from app.routers.users.user_model import User
+from tests.test_routers.test_users.data_dump import user_data
+from tests.test_routers.test_db_setup import setup_database
+
+@pytest.fixture
+async def test_user(setup_database):
+    user = User(**user_data[0])
+    await user.insert()
+    return user
 
 class TestUserService:
 
     @pytest_asyncio.fixture(autouse=True)
-    async def setup_class(self, setup_database, user_service):
+    async def setup_class(self, setup_database, user_service: UserService):
         self.database = setup_database
         self.user_service = user_service
 
@@ -50,7 +59,6 @@ class TestUserService:
             },
         }
         user_create = UserCreate(**data)
-        print(user_create.model_dump())
         new_user = await self.user_service.create_user(user_create=user_create)
         assert new_user.email == user_create.email
         assert new_user.email == data.get('email')
@@ -61,3 +69,10 @@ class TestUserService:
         assert document.email == user_create.email
         assert document.address.street == user_create.address.street
         assert document.address.street == data.get('address')['street']
+
+
+    @pytest.mark.asyncio
+    async def test_get_user(self, test_user):
+        user = await self.user_service.get_user(user_id=test_user)
+        assert user is not None
+        assert user.username == "Bret"
