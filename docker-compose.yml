@@ -15,7 +15,7 @@ services:
       - MONGO_INITDB_ROOT_HOST=${MONGO_INITDB_ROOT_HOST}
       - MONGO_INITDB_ROOT_DBNAME=${MONGO_INITDB_ROOT_DBNAME}
   db:
-    image: mongo
+    image: topz2k480/json-placeholder-turbit:latest
     container_name: jsonplaceholder-mongodb
     restart: always
     env_file:
