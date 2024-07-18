@@ -15,3 +15,6 @@ Develop a pipeline that involves setting up a MongoDB database using Docker Comp
     - Develop a FastAPI application to provide access to the Mongo data.
     - Include endpoints to report the total number of posts from each user and comments for each post.
     - Include endpoints to add / modify / delete a user.
+
+
+MongoDB docker image: docker pull topz2k480/json-placeholder-turbit
