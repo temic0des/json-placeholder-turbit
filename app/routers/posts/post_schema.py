@@ -17,9 +17,11 @@ class PostCreate(PostBase):
 
 class PostRead(PostBase):
 
-    number_of_comments: int = 0
-    user: int = Field(..., alias='userId')
+    model_config = ConfigDict(populate_by_name=True)
 
+    number_of_comments: int = 0
+    user_id: int = Field(..., alias='userId')
+    
 class PostCommentRead(PostBase):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
