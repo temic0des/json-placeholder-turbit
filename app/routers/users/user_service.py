@@ -172,9 +172,14 @@ class UserService(IUser):
         # Get the posts associated with the user
         user_posts = await Post.find(Post.user_id == user_id).to_list()
 
-        # Attach each album to the PostRead schema
-        posts_read = [PostRead(**user_post.model_dump()) for user_post in user_posts]
-        # UserAlbumRead user model with the list of albums
+        # Empty list for the post
+        posts_read = []
+        # Loop through each users post
+        for user_post in user_posts:
+            # Get each comments count
+            comment_count = await Comment.find(Comment.post_id == user_post.id).count()
+            # Append the users posts and comment count to the list
+            posts_read.append(PostRead(**user_post.model_dump(), number_of_comments=comment_count))
         user_post_read = UserPostRead(**user.model_dump(), posts=posts_read)
         return user_post_read
     
