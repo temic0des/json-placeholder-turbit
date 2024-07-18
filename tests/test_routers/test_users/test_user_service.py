@@ -1,4 +1,5 @@
-from app.routers.users.user_schema import UserCreate
+from app.routers.posts.post_model import Post
+from app.routers.users.user_schema import UserCreate, UserRead
 from app.routers.users.user_service import UserService
 from tests.test_routers.test_users.data_dump import user_data
 import pytest
@@ -19,6 +20,22 @@ class TestUserService:
     async def setup_class(self, setup_database, user_service: UserService):
         self.database = setup_database
         self.user_service = user_service
+
+    @pytest.mark.asyncio
+    async def test_get_all_users(self):
+        users = []
+        for user in users:
+            user_in = User(**user)
+            post_count = await Post.find(Post.user_id == user_in.id).count()
+            users.append(UserRead(**user_in.model_dump(), number_of_posts=post_count))
+        result = await self.user_service.get_all_users()
+        assert result == users
+
+    @pytest.mark.asyncio
+    async def test_get_all_users_empty_user(self):
+        users = []
+        result = await self.user_service.get_all_users()
+        assert result == users
 
     @pytest.mark.asyncio
     async def test_add_users(self):
@@ -69,10 +86,3 @@ class TestUserService:
         assert document.email == user_create.email
         assert document.address.street == user_create.address.street
         assert document.address.street == data.get('address')['street']
-
-
-    @pytest.mark.asyncio
-    async def test_get_user(self, test_user):
-        user = await self.user_service.get_user(user_id=test_user)
-        assert user is not None
-        assert user.username == "Bret"

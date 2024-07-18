@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 from app.routers.todos.todo_model import Todo
 
 
@@ -17,7 +17,7 @@ class ITodo(ABC):
 
     @staticmethod
     @abstractmethod
-    async def get_todo_by_id(todo_id: int) -> Todo:
+    async def get_todo_by_id(todo_id: int) -> Optional[Todo]:
         pass
 
     @staticmethod
